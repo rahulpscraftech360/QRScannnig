@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <title>QR Code Generator</title>
+  <style>
+    /*  body {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      width: 100vw;
+      background-repeat: no-repeat;
+      background-size: cover;
+      background-attachment: fixed;
+      background-color: #000;
+      overflow: hidden;
+    }*/
+
+    label {
+      letter-spacing: 2px;
+    }
+
+    * {
+      background-color: #fdf7e7;
+      scroll-behavior: none;
+      overflow: hidden;
+    }
+
+    #img {
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+    form {
+      z-index: 200;
+    }
+
+    /* @media only screen and (max-width: 600px) {
+      #img {
+        position: absolute;
+        z-index: 100;
+        width: 100%;
+        height: 100vh;
+        object-fit: cover;
+        background-position: center;
+      }
+    } */
+  </style>
+</head>
+
+<body class="flex justify-center items-center">
+  <% if (!qrCodeData) { %>
+
+    <form action="/generate" method="POST"
+      class="w-[100%] h-screen rounded-2xl text-center flex flex-col justify-center items-center xl:flex  xl:flex-col ">
+      <img id="img" src="../asset/logo.png"  class="w-96 mb-10 mt-40 ml-48">
+      <input type="text" id="qrText" name="qrText" required class="rounded xl:w-[30%] w-[60%] p-[10px] shadow-md"
+        placeholder="LOGIN-ID" />
+      <input type="text" id="name" name="name" required class="rounded xl:w-[30%] w-[60%] p-[10px] shadow-md mt-4"
+        placeholder="USER NAME" />
+      <br />
+      <button type="submit" class="rounded-xl bg-black text-white p-[10px] mt-10 font-bold xl:w-[30%] w-[60%]">
+        Submit
+      </button>
+    </form>
+    <% } %>
+      <% if (qrCodeData) { %>
+        <div class="text-center flex flex-col items-center m-2">
+          <a class="font-bold xl:text-2xl text-sm text-white">
+
+          </a>
+          <img class="xl:w-[20%] w-[30%] mt-6" src="<%= qrCodeData %>" alt="QR Code" />
+          <h1 class="font-bold xl:text-2xl text-sm text-black mt-10">
+            Click here below to Download!
+          </h1>
+          <a href="<%= qrCodeData %>" download="qrcode.png" class="font-bold text-xl text-white underline mt-4">
+            <img class="w-[10%] m-auto" src="../asset/download.png" alt="" /></a>
+          <!-- <button type="submit" onclick="goBack()" class="rounded-xl bg-black text-black bg-white p-1 mt-10 font-bold w-[30%] ">Go Back</button> -->
+        </div>
+        <% } %>
+          <script>
+            // goBack = () => {
+            //   location.href = "/";
+            // };
+          </script>
+</body>
+
+</html>

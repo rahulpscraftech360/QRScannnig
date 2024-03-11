@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=no"
+    />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>WEL COME</title>
+    <script type="text/javascript" src="/asset/instascan.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+
+    <style>
+      * {
+        background-color: #3d1c32;
+        scroll-behavior: none;
+      }
+
+      /* img {
+        position: absolute;
+        top: 0;
+        left: 0;
+      } */
+
+      @keyframes spin {
+        from {
+          transform: rotate(0deg);
+        }
+
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      #GFG{
+        color: white;
+      }
+
+      .spinner {
+        --spinner-color: #000;
+        aspect-ratio: 1/1;
+        border-radius: 50%;
+        animation-name: spin;
+        animation-iteration-count: infinite;
+        animation-timing-function: linear;
+      }
+
+      .spinner--dotted {
+        width: 5rem;
+        border: 0.5rem dotted var(--spinner-color);
+        display: block;
+        animation-duration: 5s;
+      }
+    </style>
+     <script> 
+      function printDiv() { 
+          var divContents = document.getElementById("msg").innerHTML; 
+          var a = window.open('', '', 'height=500, width=500'); 
+          a.document.write('<html>'); 
+          a.document.write(divContents); 
+          a.document.write('</body></html>'); 
+          a.document.close(); 
+          a.print(); 
+      } 
+  </script>
+  </head>
+  
+
+  <body class="w-screen h-screen">
+
+      
+    <!-- <input type="button" value="click" onclick="printDiv()">  -->
+  </div> 
+    <div class="flex flex-col justify-center items-center">
+      <div class="bg-red-500 w-72 mb-10 mt-20">
+        <img src="../asset/logo1.png" class="w-full" />
+      </div>
+      <div class="flex flex-col justify-center items-center my-14">
+        <h3 id="msg" class="text-blue-950 text-center text-6xl hidden">
+          <strong class="text-white text-center text-3xl "> WELCOME </strong
+          ><br />
+          <strong id="name" class="text-white text-center text-3xl pt-3"
+            >
+       </strong
+          ><br />
+          <strong id="position" class="text-white text-center text-2xl pt-2"
+          > 
+          </strong>
+
+        </h3>
+        <h3 id="msg2" class="text-center hidden">
+          <strong id="name2" class="text-red-400 font-bold text-4xl"> </strong
+          ><br />
+        </h3>
+        <video
+          id="preview"
+          class="rounded-[36px] shadow-[rgba(0,_0,_0,_0.4)_0px_30px_90px] xl:w-[40%] w-[60%] md:w-[60%]"
+        ></video>
+        <div
+          id="container"
+          class="absolute top-[50%] hidden"
+          role="status"
+          id="loading"
+        >
+          <span class="spinner spinner--dotted"></span>
+        </div>
+      </div>
+      <div>
+        <form id="searchForm" class="relative">
+       
+          </button>
+        </form>
+      </div>
+    </div>
+    <script>
+      const spinner = document.getElementById("container");
+      const preview = document.getElementById("preview");
+      const msg = document.getElementById("msg");
+      const nameElement = document.getElementById("name"); // For showing "WELCOME TO CRAFTECH 360 <USER NAME>"
+      const msg2 = document.getElementById("msg2");
+      const name2 = document.getElementById("name2"); // For showing error messages or additional info
+      const searchForm = document.getElementById("searchForm"); // Assuming there's a form or input for manual user search
+    const position=document.getElementById("position")
+      let scanner = new Instascan.Scanner({
+        video: document.getElementById("preview"),
+      });
+    
+      scanner.addListener("scan", function(content) {
+        console.log("QR Code content:", content);
+        getUser(content);
+      });
+    
+      Instascan.Camera.getCameras().then(function(cameras) {
+        if (cameras.length > 0) {
+          scanner.start(cameras[0]).catch((e) => console.error("Error starting camera:", e));
+        } else {
+          console.error("No cameras found.");
+        }
+      });
+    
+      async function getUser(uniqueCode) {
+        spinner.style.display = "flex"; // Show the loading spinner
+        preview.style.display = "none"; // Hide the video preview
+    
+        const response = await fetch("/get-user-scan", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ uniqueCode }),
+        });
+    
+        spinner.style.display = "none"; // Hide the loading spinner after fetching the data
+    
+        if (response.ok) {
+          const userData = await response.json();
+          if (userData.success && userData.name) {
+            // Concatenate the welcome message with the user's name
+            nameElement.textContent = ` ${userData.name}`;
+            position.textContent=`${userData.position}`;
+
+            msg.classList.remove('hidden'); // Show the welcome message
+            
+            // Automatically hide the message after 4 seconds
+            setTimeout(function() {
+              msg.classList.add('hidden');
+              preview.style.display = "block"; // Optionally show the preview again
+            }, 4000);
+          } else {
+            // Handle error or user not found
+            name2.textContent = userData.message; // Show error message
+            msg2.classList.remove('hidden');
+            
+            setTimeout(function() {
+              msg2.classList.add('hidden');
+            }, 4000);
+          }
+        } else {
+          console.error("Failed to fetch user data.");
+          name2.textContent = "Error processing request";
+          msg2.classList.remove('hidden');
+          
+          setTimeout(function() {
+            msg2.classList.add('hidden');
+          }, 4000);
+        }
+      }
+    </script>
+    
+  </body>
+</html>

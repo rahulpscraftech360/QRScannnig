@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Attended count</h1>
+    <h1 id="count"></h1>
+    <button onclick="getCount()">GET COUNT</button>
+    <script>
+        async function getCount(uniqueCode) {
+        console.log("inside-function");
+        const response = await fetch("/get-user-count", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ uniqueCode }),
+        });
+        if (response.ok) {
+          try {
+            const userData = await response.json();
+            document.getElementById('count').innerText = userData.count
+            console.log(userData);
+          } catch (error) {
+            console.error("Error parsing JSON:", error);
+          }
+        } else {
+          console.log('error');
+        }
+    }
+    </script>
+</body>
+</html>
